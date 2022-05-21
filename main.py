@@ -11,7 +11,7 @@ players = []
 points = []
 
 
-def click_event(event, x, y):
+def click_event(event, x, y, flags, params):
     if event == cv2.EVENT_LBUTTONDOWN:
         points.append((x, y))
         print(x, ' ', y)
