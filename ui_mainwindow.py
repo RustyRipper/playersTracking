@@ -23,8 +23,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1000, 833)
-        MainWindow.setMinimumSize(QSize(1000, 800))
+        MainWindow.resize(1000, 820)
+        MainWindow.setMinimumSize(QSize(1000, 820))
+        MainWindow.setMaximumSize(QSize(1000, 820))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalFrame = QFrame(self.centralwidget)
@@ -74,16 +75,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.chooseFilm)
 
-        self.layoutWidget = QWidget(self.centralwidget)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(280, 10, 704, 810))
-        self.verticalLayout_5 = QVBoxLayout(self.layoutWidget)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_6 = QVBoxLayout()
+        self.widget = QWidget(self.centralwidget)
+        self.widget.setObjectName(u"widget")
+        self.widget.setGeometry(QRect(281, 11, 702, 808))
+        self.verticalLayout_6 = QVBoxLayout(self.widget)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_6.setSizeConstraint(QLayout.SetDefaultConstraint)
-        self.label_2 = QLabel(self.layoutWidget)
+        self.verticalLayout_6.setSizeConstraint(QLayout.SetMaximumSize)
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.label_2 = QLabel(self.widget)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMaximumSize(QSize(700, 400))
         self.label_2.setPixmap(QPixmap(u"../data/dst.jpg"))
@@ -91,22 +90,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.label_2)
 
-        self.label = QLabel(self.layoutWidget)
+        self.label = QLabel(self.widget)
         self.label.setObjectName(u"label")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy1)
+        self.label.setMinimumSize(QSize(700, 400))
         self.label.setMaximumSize(QSize(700, 400))
         self.label.setContextMenuPolicy(Qt.CustomContextMenu)
         self.label.setPixmap(QPixmap(u"../data/dst.jpg"))
         self.label.setScaledContents(True)
 
         self.verticalLayout_6.addWidget(self.label)
-
-
-        self.verticalLayout_5.addLayout(self.verticalLayout_6)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
