@@ -1,19 +1,25 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(r'data\2.mp4')
-ground = cv2.imread(r'data\dst.jpg')
+cap = cv2.VideoCapture(r'data\video.avi')
+ground = cv2.imread(r'data\dst2.png')
+scale = 30
+width = int(ground.shape[1] * scale / 100)
+height = int(ground.shape[0] * scale / 100)
+
+dim = (width, height)
+ground = cv2.resize(ground, dim, interpolation=cv2.INTER_AREA)
 
 trackers = cv2.legacy.MultiTracker_create()
 success, frame = cap.read()
 
 players = []
-points = []
+points_plane = []
 
 
 def click_event(event, x, y, flags, params):
     if event == cv2.EVENT_LBUTTONDOWN:
-        points.append((x, y))
+        points_plane.append((x, y))
         print(x, ' ', y)
         cv2.destroyWindow("Plane")
 
@@ -40,23 +46,25 @@ def draw_plane(matrix, players):
         x1 = int(pts3o[0][0][0])
         y1 = int(pts3o[0][0][1])
         pp = (x1, y1)
-
-        cv2.circle(copy_temp, pp, 15, (0, 0, 255), -1)
+        if p[4] == 'team2':
+            cv2.circle(copy_temp, pp, 7, (0, 0, 255), -1)
+        else:
+            cv2.circle(copy_temp, pp, 7, (255, 0, 0), -1)
     return copy_temp
 
 
-def detect_players():
+def detect_players(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     lower_green = np.array([40, 40, 40])
-    upper_green = np.array([70, 255, 255])
-
-    lower_blue = np.array([110, 50, 50])
+    upper_green = np.array([61, 255, 255])
+    # blue range
+    lower_blue = np.array([50, 0, 130])
     upper_blue = np.array([130, 255, 255])
-
-    lower_red = np.array([0, 31, 255])
-    upper_red = np.array([176, 255, 255])
-
+    # Red range
+    lower_red = np.array([0, 0, 0])
+    upper_red = np.array([38, 255, 255])
+    # white range
     lower_white = np.array([0, 0, 0])
     upper_white = np.array([0, 0, 255])
 
@@ -73,68 +81,47 @@ def detect_players():
 
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    prev = 0
-    font = cv2.FONT_HERSHEY_SIMPLEX
-
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
 
-        # Detect players
-        if h >= 1.5 * w:
-            if w > 15 and h >= 15:
+        if h >= 1.3 * w:
+            if w > 10 and h >= 10:
 
                 player_img = frame[y:y + h, x:x + w]
+
                 player_hsv = cv2.cvtColor(player_img, cv2.COLOR_BGR2HSV)
-                # If player has blue jersy
+
                 mask1 = cv2.inRange(player_hsv, lower_blue, upper_blue)
                 res1 = cv2.bitwise_and(player_img, player_img, mask=mask1)
                 res1 = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
                 res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
 
                 nz_count = cv2.countNonZero(res1)
-                # If player has red jersy
+                print(nz_count)
                 mask2 = cv2.inRange(player_hsv, lower_red, upper_red)
                 res2 = cv2.bitwise_and(player_img, player_img, mask=mask2)
                 res2 = cv2.cvtColor(res2, cv2.COLOR_HSV2BGR)
                 res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
 
-                nz_countred = cv2.countNonZero(res2)
-
-                if nz_count >= 20:
-                    # Mark blue jersy players as france
-                    cv2.putText(frame, 'teamBlue', (x - 2, y - 2), font, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
+                nz_counted = cv2.countNonZero(res2)
+                print(nz_counted)
+                if nz_count >= 10:
+                    color = 'team1'
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
-                    players.append([x, y, w, h])
+                    players.append([x, y, w, h, color])
                 else:
                     pass
-                if nz_countred >= 20:
-                    # Mark red jersy players as belgium
-                    cv2.putText(frame, 'teamRed', (x - 2, y - 2), font, 0.8, (0, 0, 255), 2, cv2.LINE_AA)
+                if nz_counted >= 10:
+                    color = 'team2'
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                    players.append([x, y, w, h])
+                    players.append([x, y, w, h, color])
                 else:
                     pass
 
-        if 1 <= h <= 30 and 1 <= w <= 30:
-            player_img = frame[y:y + h, x:x + w]
 
-            player_hsv = cv2.cvtColor(player_img, cv2.COLOR_BGR2HSV)
-            # white ball  detection
-            mask1 = cv2.inRange(player_hsv, lower_white, upper_white)
-            res1 = cv2.bitwise_and(player_img, player_img, mask=mask1)
-            res1 = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
-            res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
-            nz_count = cv2.countNonZero(res1)
+tracking_points = 4
 
-            if nz_count >= 3:
-                # detect football
-                cv2.putText(frame, 'football', (x - 2, y - 2), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-
-
-k = 4
-
-for i in range(k):
+for i in range(tracking_points):
     cv2.imshow("Frame", frame)
     cv2.imshow("Plane", ground)
     cv2.setMouseCallback('Plane', click_event)
@@ -143,25 +130,33 @@ for i in range(k):
     tracker_i = cv2.legacy.TrackerCSRT_create()
     trackers.add(tracker_i, frame, bbox_i)
 
-idx = 0
+static = True
+tracker_bool = True
+
+if static:
+    tracker_bool = False
+
+success, bboxes = trackers.update(frame)
 
 while cap.isOpened():
 
-    timer = cv2.getTickCount()
-
     success, frame = cap.read()
+    timer = cv2.getTickCount()
     players = []
-    success, bboxes = trackers.update(frame)
 
-    detect_players()
+    if tracker_bool:
+        success, bboxes = trackers.update(frame)
+
+    detect_players(frame)
+
     if success:
         for bbox in bboxes:
             draw_box(frame, bbox)
 
     fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer)
     cv2.putText(frame, str(int(fps)), (75, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-
-    p = draw_plane(plane(points, bboxes), players)
+    frame = cv2.resize(frame, dim)
+    p = draw_plane(plane(points_plane, bboxes), players)
     cv2.imshow("Frame", frame)
     cv2.imshow('Plane', p)
     if cv2.waitKey(1) & 0XFF == ord('q'):
