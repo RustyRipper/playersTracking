@@ -232,13 +232,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addLayout(self.verticalLayout_2)
 
-        self.chooseFilm = QPushButton(self.horizontalFrame)
-        self.chooseFilm.setObjectName(u"chooseFilm")
-        sizePolicy.setHeightForWidth(self.chooseFilm.sizePolicy().hasHeightForWidth())
-        self.chooseFilm.setSizePolicy(sizePolicy)
-        self.chooseFilm.setFont(font2)
+        self.ButtonStart = QPushButton(self.horizontalFrame)
+        self.ButtonStart.setObjectName(u"ButtonStart")
+        sizePolicy.setHeightForWidth(self.ButtonStart.sizePolicy().hasHeightForWidth())
+        self.ButtonStart.setSizePolicy(sizePolicy)
+        self.ButtonStart.setFont(font2)
 
-        self.verticalLayout_3.addWidget(self.chooseFilm)
+        self.verticalLayout_3.addWidget(self.ButtonStart)
 
 
         self.horizontalLayout.addWidget(self.horizontalFrame)
@@ -296,7 +296,7 @@ class Ui_MainWindow(object):
         self.pushButton_5.setText(QCoreApplication.translate("MainWindow", u"Boisko", None))
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Dru\u017cyna 1", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Dru\u017cyna 2", None))
-        self.chooseFilm.setText(QCoreApplication.translate("MainWindow", u"Start", None))
+        self.ButtonStart.setText(QCoreApplication.translate("MainWindow", u"Start", None))
         self.label_2.setText("")
         self.label.setText("")
     # retranslateUi

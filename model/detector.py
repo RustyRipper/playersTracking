@@ -74,4 +74,3 @@ class Detector:
                     else:
                         pass
         return self.players
-

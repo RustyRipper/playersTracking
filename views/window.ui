@@ -1016,7 +1016,7 @@ do zapisu</string>
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="chooseFilm">
+        <widget class="QPushButton" name="ButtonStart">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>

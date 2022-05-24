@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def nothing(x):
     pass
 
@@ -12,7 +13,6 @@ width = int(image1.shape[1] * scale / 100)
 height = int(image1.shape[0] * scale / 100)
 dim = (width, height)
 image = cv2.resize(image1, dim, interpolation=cv2.INTER_AREA)
-
 
 cv2.namedWindow('image')
 
@@ -62,6 +62,6 @@ while 1:
         break
 
 print("(hMin = %d , sMin = %d, vMin = %d), (hMax = %d , sMax = %d, vMax = %d)" % (
-            hMin, sMin, vMin, hMax, sMax, vMax))
+    hMin, sMin, vMin, hMax, sMax, vMax))
 
 cv2.destroyAllWindows()

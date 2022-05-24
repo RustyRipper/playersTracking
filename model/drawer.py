@@ -44,7 +44,8 @@ class Drawer:
             copy_temp = self.draw_box(copy_temp, bbox)
         return copy_temp
 
-    def draw_box(self, frame, bbox):
+    @staticmethod
+    def draw_box(frame, bbox):
         copy_temp = frame.copy()
         x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
         cv2.rectangle(copy_temp, (x, y), ((x + w), (y + h)), (255, 0, 255), 3, 1)
