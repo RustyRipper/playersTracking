@@ -27,7 +27,7 @@ class Main(QThread):
     def run(self):
         out = cv2.VideoWriter()
         if self.save is not None:
-            out = cv2.VideoWriter(self.save + '/output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (640, 480))
+            out = cv2.VideoWriter(self.save + '/output.avi', cv2.VideoWriter_fourcc(*'XVID'), 20.0, (640, 480))
         cap = cv2.VideoCapture(self.path1)
         ground = cv2.imread(r'data\dst2.png')
         scale = 30
@@ -58,10 +58,10 @@ class Main(QThread):
                 players = detector.detect_players(frame, self.hsv_pitch, self.hsv_team1, self.hsv_team2)
 
                 if tracker_bool:
-                    bboxes = tracker.update_frame(frame)
-                    print('lol')
+                    success, bboxes = tracker.update_frame(frame)
 
-                    frame = drawer.draw_boxes(frame, bboxes)
+                    if success:
+                        frame = drawer.draw_boxes(frame, bboxes)
 
                 frame = drawer.draw_players(players, frame)
 
@@ -72,15 +72,17 @@ class Main(QThread):
                 p = drawer.draw_plane(tracker.plane(), players, ground)
 
                 if self.save is not None:
-                    out.write(p)
+                    out.write(cv2.resize(p, (640, 480)))
                 self.change_pixmap_signal.emit(p)
                 self.change_pixmap_signal2.emit(frame)
                 # cv2.imshow("Frame", frame)
                 # cv2.imshow('Plane', p)
-            if cv2.waitKey(1) & 0XFF == ord('q'):
+                if cv2.waitKey(1) & 0XFF == ord('q'):
+                    break
+            else:
                 break
-
         out.release()
+        print("save")
         cap.release()
         cv2.destroyAllWindows()
 

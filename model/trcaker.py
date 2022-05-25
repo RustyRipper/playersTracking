@@ -38,4 +38,4 @@ class Tracker:
 
     def update_frame(self, frame):
         success, self.bboxes = self.trackers.update(frame)
-        return self.bboxes
+        return success, self.bboxes
