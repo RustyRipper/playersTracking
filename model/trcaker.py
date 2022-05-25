@@ -25,7 +25,7 @@ class Tracker:
             cv2.setMouseCallback('Plane', self.click_event)
 
             bbox_i = cv2.selectROI("Frame", frame, False)
-            tracker_i = cv2.legacy.TrackerMOSSE_create()
+            tracker_i = cv2.legacy.TrackerMIL_create()
             self.trackers.add(tracker_i, frame, bbox_i)
 
             cv2.destroyWindow("Frame")
@@ -36,6 +36,6 @@ class Tracker:
             print(x, ' ', y)
             cv2.destroyWindow("Plane")
 
-    def update(self, frame):
+    def update_frame(self, frame):
         success, self.bboxes = self.trackers.update(frame)
-        return success, self.bboxes
+        return self.bboxes

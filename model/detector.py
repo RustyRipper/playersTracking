@@ -8,22 +8,19 @@ class Detector:
         self.players = []
         pass
 
-    def detect_players(self, frame_input):
+    def detect_players(self, frame_input, hsv_pitch, hsv_team1, hsv_team2):
         self.players = []
         frame = frame_input.copy()
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        lower_green = np.array([40, 40, 40])
-        upper_green = np.array([61, 255, 255])
-        # blue range
-        lower_blue = np.array([50, 0, 130])
-        upper_blue = np.array([130, 255, 255])
-        # Red range
-        lower_red = np.array([0, 0, 0])
-        upper_red = np.array([38, 255, 255])
-        # white range
-        lower_white = np.array([0, 0, 0])
-        upper_white = np.array([0, 0, 255])
+        lower_green = np.array([hsv_pitch[0], hsv_pitch[1], hsv_pitch[2]])
+        upper_green = np.array([hsv_pitch[3], hsv_pitch[4], hsv_pitch[5]])
+
+        lower_blue = np.array([hsv_team1[0], hsv_team1[1], hsv_team1[2]])
+        upper_blue = np.array([hsv_team1[3], hsv_team1[4], hsv_team1[5]])
+
+        lower_red = np.array([hsv_team2[0], hsv_team2[1], hsv_team2[2]])
+        upper_red = np.array([hsv_team2[3], hsv_team2[4], hsv_team2[5]])
 
         mask = cv2.inRange(hsv, lower_green, upper_green)
 
@@ -42,7 +39,7 @@ class Detector:
             x, y, w, h = cv2.boundingRect(c)
 
             if h >= 1.3 * w:
-                if w > 10 and h >= 10:
+                if w > 5 and h >= 5:
 
                     player_img = frame[y:y + h, x:x + w]
 
@@ -61,13 +58,13 @@ class Detector:
 
                     nz_counted = cv2.countNonZero(res2)
 
-                    if nz_count >= 10:
+                    if nz_count >= 20:
                         color = 'team1'
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
                         self.players.append([x, y, w, h, color])
                     else:
                         pass
-                    if nz_counted >= 10:
+                    if nz_counted >= 20:
                         color = 'team2'
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
                         self.players.append([x, y, w, h, color])

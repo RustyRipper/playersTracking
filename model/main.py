@@ -11,11 +11,23 @@ class Main(QThread):
     change_pixmap_signal = Signal(np.ndarray)
     change_pixmap_signal2 = Signal(np.ndarray)
 
-    def __init__(self, path1):
+    def __init__(self, path1, hsv_pitch, hsv_team1, hsv_team2, static=True, save=None):
         super().__init__()
         self.path1 = path1
+        self.hsv_pitch = hsv_pitch
+        self.hsv_team1 = hsv_team1
+        self.hsv_team2 = hsv_team2
+        self.static = static
+        print(self.static)
+        self.save = save
+
+    def stop(self):
+        self.terminate()
 
     def run(self):
+        out = cv2.VideoWriter()
+        if self.save is not None:
+            out = cv2.VideoWriter(self.save + '/output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (640, 480))
         cap = cv2.VideoCapture(self.path1)
         ground = cv2.imread(r'data\dst2.png')
         scale = 30
@@ -27,45 +39,48 @@ class Main(QThread):
 
         success, frame = cap.read()
 
-        static = False
         tracker_bool = True
 
-        if static:
+        if self.static:
             tracker_bool = False
 
         detector = Detector()
         drawer = Drawer()
         tracker = Tracker()
         tracker.getTrackingPoints(frame, ground)
-        tracker.update(frame)
+        tracker.update_frame(frame)
 
         while cap.isOpened():
 
             success, frame = cap.read()
             timer = cv2.getTickCount()
+            if success:
+                players = detector.detect_players(frame, self.hsv_pitch, self.hsv_team1, self.hsv_team2)
 
-            players = detector.detect_players(frame)
+                if tracker_bool:
+                    bboxes = tracker.update_frame(frame)
+                    print('lol')
 
-            if tracker_bool:
-                success, bboxes = tracker.update(frame)
-                if success:
                     frame = drawer.draw_boxes(frame, bboxes)
 
-            frame = drawer.draw_players(players, frame)
+                frame = drawer.draw_players(players, frame)
 
-            fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer)
-            cv2.putText(frame, str(int(fps)), (75, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer)
+                cv2.putText(frame, str(int(fps)), (75, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            frame = cv2.resize(frame, dim)
-            p = drawer.draw_plane(tracker.plane(), players, ground)
+                frame = cv2.resize(frame, dim)
+                p = drawer.draw_plane(tracker.plane(), players, ground)
 
-            self.change_pixmap_signal.emit(p)
-            self.change_pixmap_signal2.emit(frame)
-            # cv2.imshow("Frame", frame)
-            # cv2.imshow('Plane', p)
+                if self.save is not None:
+                    out.write(p)
+                self.change_pixmap_signal.emit(p)
+                self.change_pixmap_signal2.emit(frame)
+                # cv2.imshow("Frame", frame)
+                # cv2.imshow('Plane', p)
             if cv2.waitKey(1) & 0XFF == ord('q'):
                 break
 
+        out.release()
         cap.release()
         cv2.destroyAllWindows()
 
