@@ -11,24 +11,16 @@ class Main(QThread):
     change_pixmap_signal = Signal(np.ndarray)
     change_pixmap_signal2 = Signal(np.ndarray)
 
-    def __init__(self, path1, hsv_pitch, hsv_team1, hsv_team2, static=True, save=None):
+    def __init__(self, model):
         super().__init__()
-        self.path1 = path1
-        self.hsv_pitch = hsv_pitch
-        self.hsv_team1 = hsv_team1
-        self.hsv_team2 = hsv_team2
-        self.static = static
-        print(self.static)
-        self.save = save
-
-    def stop(self):
-        self.terminate()
+        self.model = model
 
     def run(self):
         out = cv2.VideoWriter()
-        if self.save is not None:
-            out = cv2.VideoWriter(self.save + '/output.avi', cv2.VideoWriter_fourcc(*'XVID'), 20.0, (640, 480))
-        cap = cv2.VideoCapture(self.path1)
+        if self.model.path_to_save is not None and self.model.save_option:
+            out = cv2.VideoWriter(self.model.path_to_save + '/output.avi', cv2.VideoWriter_fourcc(*'XVID'), 20.0, (640, 480))
+
+        cap = cv2.VideoCapture(self.model.path_to_file[0])
         ground = cv2.imread(r'data\dst2.png')
         scale = 30
         width = int(ground.shape[1] * scale / 100)
@@ -41,7 +33,7 @@ class Main(QThread):
 
         tracker_bool = True
 
-        if self.static:
+        if self.model.static_camera :
             tracker_bool = False
 
         detector = Detector()
@@ -55,7 +47,7 @@ class Main(QThread):
             success, frame = cap.read()
             timer = cv2.getTickCount()
             if success:
-                players = detector.detect_players(frame, self.hsv_pitch, self.hsv_team1, self.hsv_team2)
+                players = detector.detect_players(frame, self.model.hsv_pitch, self.model.hsv_team1, self.model.hsv_team2)
 
                 if tracker_bool:
                     success, bboxes = tracker.update_frame(frame)
@@ -71,7 +63,7 @@ class Main(QThread):
                 frame = cv2.resize(frame, dim)
                 p = drawer.draw_plane(tracker.plane(), players, ground)
 
-                if self.save is not None:
+                if self.model.path_to_save is not None and self.model.save_option:
                     out.write(cv2.resize(p, (640, 480)))
                 self.change_pixmap_signal.emit(p)
                 self.change_pixmap_signal2.emit(frame)
@@ -86,6 +78,5 @@ class Main(QThread):
         cap.release()
         cv2.destroyAllWindows()
 
-
-if __name__ == "__main__":
-    main = Main()
+    def stop(self):
+        self.terminate()
