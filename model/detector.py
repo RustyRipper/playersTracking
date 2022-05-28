@@ -3,6 +3,9 @@ import numpy as np
 
 
 class Detector:
+    MINIMUM_HEIGHT_MULTIPLIER = 1.3
+    MINIMUM_WIDTH_PIXELS = 5
+    MINIMUM_HEIGHT_PIXELS = 5
 
     def __init__(self):
         self.players = []
@@ -38,8 +41,8 @@ class Detector:
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
 
-            if h >= 1.3 * w:
-                if w > 5 and h >= 5:
+            if h >= self.MINIMUM_HEIGHT_MULTIPLIER * w:
+                if w > self.MINIMUM_WIDTH_PIXELS and h >= self.MINIMUM_HEIGHT_PIXELS:
 
                     player_img = frame[y:y + h, x:x + w]
 
@@ -49,25 +52,26 @@ class Detector:
                     res1 = cv2.bitwise_and(player_img, player_img, mask=mask1)
                     res1 = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
                     res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
+                    nz_count_1 = cv2.countNonZero(res1)
 
-                    nz_count = cv2.countNonZero(res1)
                     mask2 = cv2.inRange(player_hsv, lower_red, upper_red)
                     res2 = cv2.bitwise_and(player_img, player_img, mask=mask2)
                     res2 = cv2.cvtColor(res2, cv2.COLOR_HSV2BGR)
                     res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
+                    nz_count_2 = cv2.countNonZero(res2)
+                    print(nz_count_2)
 
-                    nz_counted = cv2.countNonZero(res2)
-
-                    if nz_count >= 20:
+                    if nz_count_1 >= 20:
                         color = 'team1'
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
                         self.players.append([x, y, w, h, color])
                     else:
                         pass
-                    if nz_counted >= 20:
+                    if nz_count_2 >= 20:
                         color = 'team2'
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
                         self.players.append([x, y, w, h, color])
                     else:
                         pass
+
         return self.players

@@ -3,9 +3,12 @@ import numpy as np
 
 
 class Tracker:
+
+    TRACKING_POINTS = 4
+
     def __init__(self):
         self.points_plane = []
-        self.tracking_points = 4
+
         self.trackers = cv2.legacy.MultiTracker_create()
         self.bboxes = []
 
@@ -19,7 +22,7 @@ class Tracker:
         return cv2.getPerspectiveTransform(pts1, pts2)
 
     def getTrackingPoints(self, frame, ground):
-        for i in range(self.tracking_points):
+        for i in range(self.TRACKING_POINTS):
             cv2.imshow("Frame", frame)
             cv2.imshow("Plane", ground)
             cv2.setMouseCallback('Plane', self.click_event)
