@@ -12,7 +12,7 @@ class DetectColor:
     def nothing(self, x):
         pass
 
-    def run(self, path, hsv_default):
+    def run(self, path, hsv_default, is_pitch=False):
         cap2 = cv2.VideoCapture(path)
         success, image = cap2.read()
 
@@ -52,6 +52,12 @@ class DetectColor:
             hsv = cv2.cvtColor(image_resized, cv2.COLOR_BGR2HSV)
             mask = cv2.inRange(hsv, lower, upper)
             result = cv2.bitwise_and(image_resized, image_resized, mask=mask)
+            if is_pitch:
+                res_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+                kernel = np.ones((13, 13), np.uint8)
+                thresh = cv2.threshold(res_gray, 127, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+                result2 = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+                cv2.imshow('image2', result2)
 
             if (ph_min != h_min) | (ps_min != s_min) | (pv_min != v_min) | (ph_max != h_max) | (ps_max != s_max) | (
                     pv_max != v_max):
@@ -62,6 +68,7 @@ class DetectColor:
                 ps_max = s_max
                 pv_max = v_max
 
+            cv2.putText(result, 'Press q to accept', (0, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             cv2.imshow('image', result)
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break

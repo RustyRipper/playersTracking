@@ -3,9 +3,10 @@ import numpy as np
 
 
 class Detector:
-    MINIMUM_HEIGHT_MULTIPLIER = 1.3
+    MINIMUM_HEIGHT_MULTIPLIER = 1
     MINIMUM_WIDTH_PIXELS = 5
     MINIMUM_HEIGHT_PIXELS = 5
+    MINIMUM_COUNT = 100
 
     def __init__(self):
         self.players = []
@@ -16,16 +17,16 @@ class Detector:
         frame = frame_input.copy()
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        lower_green = np.array([hsv_pitch[0], hsv_pitch[1], hsv_pitch[2]])
-        upper_green = np.array([hsv_pitch[3], hsv_pitch[4], hsv_pitch[5]])
+        lower_pitch = np.array([hsv_pitch[0], hsv_pitch[1], hsv_pitch[2]])
+        upper_pitch = np.array([hsv_pitch[3], hsv_pitch[4], hsv_pitch[5]])
 
-        lower_blue = np.array([hsv_team1[0], hsv_team1[1], hsv_team1[2]])
-        upper_blue = np.array([hsv_team1[3], hsv_team1[4], hsv_team1[5]])
+        lower_team1 = np.array([hsv_team1[0], hsv_team1[1], hsv_team1[2]])
+        upper_team1 = np.array([hsv_team1[3], hsv_team1[4], hsv_team1[5]])
 
-        lower_red = np.array([hsv_team2[0], hsv_team2[1], hsv_team2[2]])
-        upper_red = np.array([hsv_team2[3], hsv_team2[4], hsv_team2[5]])
+        lower_team2 = np.array([hsv_team2[0], hsv_team2[1], hsv_team2[2]])
+        upper_team2 = np.array([hsv_team2[3], hsv_team2[4], hsv_team2[5]])
 
-        mask = cv2.inRange(hsv, lower_green, upper_green)
+        mask = cv2.inRange(hsv, lower_pitch, upper_pitch)
 
         res = cv2.bitwise_and(frame, frame, mask=mask)
 
@@ -48,30 +49,34 @@ class Detector:
 
                     player_hsv = cv2.cvtColor(player_img, cv2.COLOR_BGR2HSV)
 
-                    mask1 = cv2.inRange(player_hsv, lower_blue, upper_blue)
+                    mask1 = cv2.inRange(player_hsv, lower_team1, upper_team1)
+
                     res1 = cv2.bitwise_and(player_img, player_img, mask=mask1)
+
                     res1 = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
+
                     res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
+
                     nz_count_1 = cv2.countNonZero(res1)
 
-                    mask2 = cv2.inRange(player_hsv, lower_red, upper_red)
+                    mask2 = cv2.inRange(player_hsv, lower_team2, upper_team2)
                     res2 = cv2.bitwise_and(player_img, player_img, mask=mask2)
-                    res2 = cv2.cvtColor(res2, cv2.COLOR_HSV2BGR)
-                    res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
-                    nz_count_2 = cv2.countNonZero(res2)
-                    print(nz_count_2)
 
-                    if nz_count_1 >= 20:
-                        color = 'team1'
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
+                    res2 = cv2.cvtColor(res2, cv2.COLOR_HSV2BGR)
+
+                    res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
+
+                    nz_count_2 = cv2.countNonZero(res2)
+
+                    if nz_count_1 >= self.MINIMUM_COUNT or nz_count_2 >= self.MINIMUM_COUNT:
+                        amount_of_pixels = nz_count_1 / ((x + w) * (y * h))
+                        amount_of_pixels2 = nz_count_2 / ((x + w) * (y * h))
+
+                        if amount_of_pixels > amount_of_pixels2:
+                            color = 'team1'
+                        else:
+                            color = 'team2'
+
                         self.players.append([x, y, w, h, color])
-                    else:
-                        pass
-                    if nz_count_2 >= 20:
-                        color = 'team2'
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                        self.players.append([x, y, w, h, color])
-                    else:
-                        pass
 
         return self.players

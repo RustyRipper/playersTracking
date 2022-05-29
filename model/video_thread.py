@@ -54,10 +54,8 @@ class VideoThread(QThread):
             if success:
                 players = detector.detect_players(frame, self._model.hsv_pitch, self._model.hsv_team1,
                                                   self._model.hsv_team2)
-
                 if tracker_bool:
                     success, bboxes = tracker.update_frame(frame)
-
                     if success:
                         frame = drawer.draw_boxes(frame, bboxes)
 

@@ -9,15 +9,15 @@ class Drawer:
     @staticmethod
     def draw_plane(matrix, players, ground):
         copy_temp = ground.copy()
-        for p in players:
-            x = p[0] + int(p[2] / 2)
-            y = p[1] + p[3]
+        for player in players:
+            x = player[0] + int(player[2] / 2)
+            y = player[1] + player[3]
             pts3 = np.float32([[x, y]])
             pts3o = cv2.perspectiveTransform(pts3[None, :, :], matrix)
             x1 = int(pts3o[0][0][0])
             y1 = int(pts3o[0][0][1])
             pp = (x1, y1)
-            if p[4] == 'team2':
+            if player[4] == 'team2':
                 cv2.circle(copy_temp, pp, 7, (0, 0, 255), -1)
             else:
                 cv2.circle(copy_temp, pp, 7, (255, 0, 0), -1)
@@ -26,12 +26,12 @@ class Drawer:
     @staticmethod
     def draw_players(players, frame):
         copy_temp = frame.copy()
-        for p in players:
-            x = p[0]
-            y = p[1]
-            w = p[2]
-            h = p[3]
-            color = p[4]
+        for player in players:
+            x = player[0]
+            y = player[1]
+            w = player[2]
+            h = player[3]
+            color = player[4]
             if color == 'team2':
                 cv2.rectangle(copy_temp, (x, y), (x + w, y + h), (0, 0, 255), 3)
             else:

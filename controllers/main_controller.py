@@ -43,7 +43,7 @@ class MainController(QObject):
     @Slot()
     def choose_field(self):
         if self._model.path_to_file != '':
-            self._model._hsv_pitch = DetectColor().run(self._model.path_to_file[0], self._model._hsv_pitch)
+            self._model._hsv_pitch = DetectColor().run(self._model.path_to_file[0], self._model._hsv_pitch, True)
 
     @staticmethod
     def convert_cv_qt(cv_image, width, height):
