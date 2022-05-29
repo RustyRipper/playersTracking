@@ -145,6 +145,9 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Disabled, QPalette.ToolTipBase, brush10)
         palette.setBrush(QPalette.Disabled, QPalette.ToolTipText, brush)
         MainWindow.setPalette(palette)
+        icon = QIcon()
+        icon.addFile("../playerstracking/data/icon.bmp", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet(u"QMainWindow{\n"
 "background:qlineargradient(spread:reflect, x1:0.483, y1:0.619455, x2:0, y2:0.619, stop:0 rgba(196, 255, 249, 255), stop:1 rgba(110, 183, 172, 255))\n"
 "}")
@@ -457,7 +460,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Players Tracker", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Wybierz film", None))
         self.checkBox_2.setText(QCoreApplication.translate("MainWindow", u"Statyczna kamera", None))
         self.checkBox.setText(QCoreApplication.translate("MainWindow", u"Zapis", None))

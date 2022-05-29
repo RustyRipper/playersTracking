@@ -42,7 +42,7 @@ class Detector:
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
 
-            if h >= self.MINIMUM_HEIGHT_MULTIPLIER * w:
+            if h > self.MINIMUM_HEIGHT_MULTIPLIER * w:
                 if w > self.MINIMUM_WIDTH_PIXELS and h >= self.MINIMUM_HEIGHT_PIXELS:
 
                     player_img = frame[y:y + h, x:x + w]
@@ -50,27 +50,20 @@ class Detector:
                     player_hsv = cv2.cvtColor(player_img, cv2.COLOR_BGR2HSV)
 
                     mask1 = cv2.inRange(player_hsv, lower_team1, upper_team1)
-
                     res1 = cv2.bitwise_and(player_img, player_img, mask=mask1)
-
                     res1 = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
-
                     res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
-
                     nz_count_1 = cv2.countNonZero(res1)
 
                     mask2 = cv2.inRange(player_hsv, lower_team2, upper_team2)
                     res2 = cv2.bitwise_and(player_img, player_img, mask=mask2)
-
                     res2 = cv2.cvtColor(res2, cv2.COLOR_HSV2BGR)
-
                     res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
-
                     nz_count_2 = cv2.countNonZero(res2)
 
                     if nz_count_1 >= self.MINIMUM_COUNT or nz_count_2 >= self.MINIMUM_COUNT:
-                        amount_of_pixels = nz_count_1 / ((x + w) * (y * h))
-                        amount_of_pixels2 = nz_count_2 / ((x + w) * (y * h))
+                        amount_of_pixels = nz_count_1 / ((x + w) * (y + h))
+                        amount_of_pixels2 = nz_count_2 / ((x + w) * (y + h))
 
                         if amount_of_pixels > amount_of_pixels2:
                             color = 'team1'

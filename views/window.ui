@@ -537,7 +537,11 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Players Tracker</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../data/icon.bmp</normaloff>../data/icon.bmp</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow{

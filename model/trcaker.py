@@ -25,7 +25,7 @@ class Tracker:
         for i in range(self.TRACKING_POINTS):
             cv2.imshow("Frame", frame)
             cv2.imshow("Plane", ground)
-            cv2.setMouseCallback('Plane', self.click_event)
+            cv2.setMouseCallback('Plane', self.__click_event)
 
             bbox_i = cv2.selectROI("Frame", frame, False)
             tracker_i = cv2.legacy.TrackerMIL_create()
@@ -33,7 +33,7 @@ class Tracker:
 
             cv2.destroyWindow("Frame")
 
-    def click_event(self, event, x, y, flags, params):
+    def __click_event(self, event, x, y, flags, params):
         if event == cv2.EVENT_LBUTTONDOWN:
             self.points_plane.append((x, y))
             print(x, ' ', y)
