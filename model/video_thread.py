@@ -29,7 +29,7 @@ class VideoThread(QThread):
                                   (self.WIDTH_SAVE, self.HEIGHT_SAVE))
 
         cap = cv2.VideoCapture(self._model.path_to_file[0])
-        ground = cv2.imread(r'data\dst2.png')
+        ground = cv2.imread(r'dst2.png')
 
         dim = (self.WIDTH_PRESENT, self.HEIGHT_PRESENT)
         ground = cv2.resize(ground, dim, interpolation=cv2.INTER_AREA)
